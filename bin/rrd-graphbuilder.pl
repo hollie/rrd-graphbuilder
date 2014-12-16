@@ -13,7 +13,6 @@ use File::Slurp;
 use RRDs;
 use XML::Simple;
 
-my $data_dir  = shift || "/var/lib/rrd";
 my $graph_dir = shift || "/var/www/rrd";
 
 my $time = time;
@@ -65,7 +64,7 @@ my @configurations = glob( $graph_dir . "/conf/*.xml" );
 # Create the plot
 foreach my $conf_file (@configurations) {
 
-    print "$conf_file\n";
+    print "\n$conf_file ";
 
     my $config = $xs->XMLin($conf_file, ForceArray => ['set']);
     
@@ -87,6 +86,8 @@ foreach my $conf_file (@configurations) {
         my $start = 'end-' . $span;
         my $rrd = $graph->{rrd};
         my @cfg   = eval($graph->{'config'}->{$graph_config}->{'content'});
+        print $@ if $@;
+        
         push (@cfg, "--end"   => $end, "--start" => $start, 
 						"--title" => $graph->{'title'} . " ($name)",
                         "--imgformat" => "PNG", "--interlaced");
