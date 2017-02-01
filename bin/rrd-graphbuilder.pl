@@ -86,13 +86,15 @@ foreach my $conf_file (@configurations) {
         my $start = 'end-' . $span;
         my $rrd = $graph->{rrd};
         my @cfg   = eval($graph->{'config'}->{$graph_config}->{'content'});
+        my $subfolder =  $rec->{'subfolder'} || "";
+        
         print $@ if $@;
         
         push (@cfg, "--end"   => $end, "--start" => $start, 
 						"--title" => $graph->{'title'} . " ($name)",
                         "--imgformat" => "PNG", "--interlaced");
 
-        RRDs::graph( $graph_dir . "/" . $file, @cfg );
+        RRDs::graph( $graph_dir . "/" . $subfolder . "/" . $file, @cfg );
         my $err = RRDs::error;
         if ($err) {
             warn "ERROR creating $file: $err\n";
