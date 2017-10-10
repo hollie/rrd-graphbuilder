@@ -1,4 +1,4 @@
-#! /usr/bin/env perl -w
+#! /usr/bin/env perl
 
 # PODNAME: rrd-graphbuilder.pl
 
@@ -12,6 +12,7 @@ use POSIX qw/strftime/;
 use File::Slurp;
 use RRDs;
 use XML::Simple;
+use Data::Dumper;
 
 my $graph_dir = shift || "/var/www/rrd";
 
@@ -20,39 +21,48 @@ my $time = time;
 my @graph_default = (
     {
         span => '1h',
-        name => "1 Hour",
+        nicename => "1 Hour",
+	end => "now",
     },
     {
         span => '6h',
-        name => "6 Hours",
+        nicename => "6 Hours",
+	end => "now",
     },
     {
         span => '1d',
-        name => "1 Day",
+        nicename => "1 Day",
+	end => "now",
     },
     {
         span => '7d',
-        name => "1 Week",
+        nicename => "1 Week",
+	end => "now",
     },
     {
         span => '1m',
-        name => "Month",
+        nicename => "Month",
+	end => "now",
     },
     {
         span => '3mon',
-        name => "3 Months",
+        nicename => "3 Months",
+	end => "now",
     },
     {
         span => '6mon',
-        name => "6 Months",
+        nicename => "6 Months",
+	end => "now",
     },
     {
         span => '1y',
-        name => "1 Year",
+        nicename => "1 Year",
+	end => "now",
     },
     {
         span => '2y',
-        name => "2 Year",
+        nicename => "2 Year",
+	end => "now",
     },
 );
 
@@ -61,12 +71,17 @@ my $xs = XML::Simple->new();
 
 my @configurations = glob( $graph_dir . "/conf/*.xml" );
 
+#print Dumper(@configurations);
+
 # Create the plot
 foreach my $conf_file (@configurations) {
 
     print "\n$conf_file ";
 
     my $config = $xs->XMLin($conf_file, ForceArray => ['set']);
+
+    #print Dumper($config);
+
     
     my $graph = $config->{'graph'};
     
@@ -85,6 +100,11 @@ foreach my $conf_file (@configurations) {
         print $span, ",";
         my $start = 'end-' . $span;
         my $rrd = $graph->{rrd};
+
+	#print "rrd: " . Dumper($rrd) . "\n";
+	#print "config: " . Dumper($graph_config) . "\n"; 
+
+        #print Dumper($graph->{'config'});
         my @cfg   = eval($graph->{'config'}->{$graph_config}->{'content'});
         my $subfolder =  $rec->{'subfolder'} || "";
         
